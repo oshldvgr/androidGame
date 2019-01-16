@@ -13,7 +13,7 @@ public class Shooter extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("texture.jpg");
+		img = new Texture("background.png");
 	}
 
 	@Override
