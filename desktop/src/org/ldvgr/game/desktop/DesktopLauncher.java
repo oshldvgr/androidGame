@@ -8,6 +8,10 @@ import org.ldvgr.game.ShooterGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new ShooterGame(), config);
+		float aspect = 3f / 4f;
+		config.width = 400;
+		config.height = (int) (config.width / aspect);
+		config.resizable = false;
+		new LwjglApplication(ShooterGame.getInstance(), config);
 	}
 }
