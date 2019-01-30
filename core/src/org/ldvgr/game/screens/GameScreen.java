@@ -1,10 +1,12 @@
 package org.ldvgr.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 
 import org.ldvgr.game.Pool.BulletPool;
 import org.ldvgr.game.base.BaseScreen;
@@ -20,6 +22,7 @@ public class GameScreen extends BaseScreen {
     private Star stars[];
     private MainShip mainShip;
     private BulletPool bulletPool;
+    Music music;
 
 
     @Override
@@ -34,6 +37,7 @@ public class GameScreen extends BaseScreen {
         }
         bulletPool = new BulletPool();
         mainShip = new MainShip(atlas, bulletPool);
+        music = Gdx.audio.newMusic(Gdx.files.internal("magic_space.mp3"));
 
     }
 
@@ -53,6 +57,7 @@ public class GameScreen extends BaseScreen {
 
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        music.play();
         batch.begin();
         background.draw(batch);
         for (Star star : stars) {
@@ -76,6 +81,7 @@ public class GameScreen extends BaseScreen {
         backgr.dispose();
         atlas.dispose();
         bulletPool.dispose();
+        music.dispose();
         super.dispose();
     }
 
@@ -98,5 +104,16 @@ public class GameScreen extends BaseScreen {
     public boolean keyUp(int keycode) {
         mainShip.keyUp(keycode);
         return super.keyUp(keycode);
+    }
+
+
+    @Override
+    public void touchDown(Vector2 touch, int pointer) {
+        mainShip.touchDown(touch, pointer);
+    }
+
+    @Override
+    public void touchUp(Vector2 touch, int pointer) {
+        mainShip.touchUp(touch, pointer);
     }
 }

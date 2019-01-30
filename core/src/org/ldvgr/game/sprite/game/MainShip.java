@@ -1,6 +1,8 @@
 package org.ldvgr.game.sprite.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +19,7 @@ public class MainShip extends Sprite {
     private BulletPool bulletPool;
     private TextureRegion bulletRegion;
     private Rect worldBounds;
+    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3"));
 
     public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 3, 1, 3);
@@ -52,6 +55,7 @@ public class MainShip extends Sprite {
                 moveRight();
                 break;
             case Input.Keys.UP:
+            case Input.Keys.ENTER:
                 shoot();
                 break;
         }
@@ -80,12 +84,33 @@ public class MainShip extends Sprite {
         }
     }
 
+    @Override
+    public boolean touchDown(Vector2 touch, int pointer) {
+        if (touch.x < 0) {
+            moveLeft();
+        } else {
+            moveRight();
+        }
+        return super.touchDown(touch, pointer);
+    }
+
+    @Override
+    public boolean touchUp(Vector2 touch, int pointer) {
+        stop();
+        return super.touchUp(touch, pointer);
+    }
+
     private void moveRight() {
-        velocity.set(v0);
+        if (getRight() <= worldBounds.getRight()) {
+            velocity.set(v0);
+        } else stop();
     }
 
     private void moveLeft() {
-        velocity.set(v0).rotate(180);
+        if (getLeft() >= worldBounds.getLeft()) {
+            velocity.set(v0).rotate(180);
+        } else stop();
+
     }
 
     private void stop() {
@@ -101,7 +126,10 @@ public class MainShip extends Sprite {
                 0.01f,
                 worldBounds,
                 1);
+        sound.play();
     }
 
-
+    public void dispose() {
+        sound.dispose();
+    }
 }
