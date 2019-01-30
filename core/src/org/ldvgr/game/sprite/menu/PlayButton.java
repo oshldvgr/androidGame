@@ -3,7 +3,7 @@ package org.ldvgr.game.sprite.menu;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import org.ldvgr.game.ShooterGame;
-import org.ldvgr.game.base.screens.GameScreen;
+import org.ldvgr.game.screens.GameScreen;
 
 public class PlayButton extends ScaledTouchUpButton {
 

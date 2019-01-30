@@ -1,4 +1,4 @@
-package org.ldvgr.game.base.screens;
+package org.ldvgr.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -6,16 +6,21 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import org.ldvgr.game.Pool.BulletPool;
 import org.ldvgr.game.base.BaseScreen;
 import org.ldvgr.game.math.Rect;
 import org.ldvgr.game.sprite.Background;
 import org.ldvgr.game.sprite.Star;
+import org.ldvgr.game.sprite.game.MainShip;
 
 public class GameScreen extends BaseScreen {
     TextureAtlas atlas;
     private Texture backgr;
     private Background background;
     private Star stars[];
+    private MainShip mainShip;
+    private BulletPool bulletPool;
+
 
     @Override
     public void show() {
@@ -23,16 +28,25 @@ public class GameScreen extends BaseScreen {
         backgr = new Texture("background.png");
         background = new Background(new TextureRegion(backgr));
         atlas = new TextureAtlas("texture1.atlas");
-        stars = new Star[256];
+        stars = new Star[60];
         for (int i = 0; i < stars.length; i++) {
             stars[i] = new Star(atlas);
         }
+        bulletPool = new BulletPool();
+        mainShip = new MainShip(atlas, bulletPool);
+
     }
 
     public void update(float delta) {
+        mainShip.update(delta);
         for (Star star : stars) {
             star.update(delta);
         }
+        bulletPool.updateActiveSprites(delta);
+    }
+
+    public void deleteAllDestroid() {
+        bulletPool.freeAllDestroyedActiveSprites();
     }
 
     public void draw() {
@@ -44,6 +58,8 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
+        mainShip.draw(batch);
+        bulletPool.drawActiveSprites(batch);
         batch.end();
     }
 
@@ -51,6 +67,7 @@ public class GameScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        deleteAllDestroid();
         draw();
     }
 
@@ -58,14 +75,28 @@ public class GameScreen extends BaseScreen {
     public void dispose() {
         backgr.dispose();
         atlas.dispose();
+        bulletPool.dispose();
         super.dispose();
     }
 
     @Override
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
+        mainShip.resize(worldBounds);
         for (Star star : stars) {
             star.resize(worldBounds);
         }
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        mainShip.keyDown(keycode);
+        return super.keyDown(keycode);
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        mainShip.keyUp(keycode);
+        return super.keyUp(keycode);
     }
 }
