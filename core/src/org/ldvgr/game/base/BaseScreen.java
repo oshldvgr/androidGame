@@ -15,7 +15,7 @@ import org.ldvgr.game.math.Rect;
 public class BaseScreen implements Screen, InputProcessor {
     protected SpriteBatch batch;
     private Rect screenBounds; //прямоугольник экрана
-    private Rect worldBounds; // прямоугольник игрового пространства
+    protected Rect worldBounds; // прямоугольник игрового пространства
     private Rect glBounds; // квадрат OpenGL;
     private Matrix4 worldToGl; // матрица перехода из игровых координат в OpenGL отрисовку
     private Matrix3 screenToWorlds; //из пикселей в координаты мира

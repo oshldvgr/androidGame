@@ -2,31 +2,23 @@ package org.ldvgr.game.sprite.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import org.ldvgr.game.Pool.BulletPool;
-import org.ldvgr.game.base.Sprite;
 import org.ldvgr.game.math.Rect;
 
-public class MainShip extends Sprite {
+public class MainShip extends Ship {
 
     private static final int INVALID_POINTER = -1;
 
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
-    private Vector2 velocity = new Vector2();
+
     private final Vector2 v0 = new Vector2(0.2f, 0f);
     private boolean isPressedLeft;
     private boolean isPressedRight;
-    private BulletPool bulletPool;
-    private TextureRegion bulletRegion;
-    private Rect worldBounds;
-    private Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3"));
-    private float reloadInterval;
-    private float reloadTimer;
+
 
     public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 3, 1, 3);
@@ -35,11 +27,16 @@ public class MainShip extends Sprite {
         setHightProportion(0.15f);
         frame = 1;
         this.reloadInterval = 0.2f;
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3"));
+        this.bulletVelocity = new Vector2(0, 0.5f);
+        this.bulletHieght = 0.01f;
+        this.damage = 1;
+        this.helth = 100;
+
     }
 
     @Override
     public void resize(Rect worldBounds) {
-        this.worldBounds = worldBounds;
         super.resize(worldBounds);
         setBottom(worldBounds.getBottom() + 0.02f);
     }
@@ -153,19 +150,5 @@ public class MainShip extends Sprite {
         velocity.setZero();
     }
 
-    private void shoot() {
-        Bullet bullet = bulletPool.obtain();
-        bullet.set(this,
-                bulletRegion,
-                pos,
-                new Vector2(0f, 0.3f),
-                0.01f,
-                worldBounds,
-                1);
-        shootSound.play(0.01f);
-    }
 
-    public void dispose() {
-        shootSound.dispose();
-    }
 }
