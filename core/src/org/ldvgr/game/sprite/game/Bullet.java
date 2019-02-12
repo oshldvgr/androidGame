@@ -36,7 +36,7 @@ public class Bullet extends Sprite {
         this.regions[0] = region;
         this.pos.set(pos0);
         this.velocity.set(v0);
-        setHightProportion(height);
+        setHeightProportion(height);
         this.worldBounds = worldBounds;
         this.damage = damage;
     }

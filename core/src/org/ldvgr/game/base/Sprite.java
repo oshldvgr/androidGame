@@ -7,12 +7,12 @@ import com.badlogic.gdx.math.Vector2;
 import org.ldvgr.game.math.Rect;
 import org.ldvgr.game.utils.Regions;
 
-public class Sprite extends Rect {
+public abstract class Sprite extends Rect {
     protected float angle;
     protected float scale = 1f;
     protected TextureRegion[] regions;
     protected int frame;
-    private boolean isDestroid;
+    private boolean isDestroyed;
 
     public Sprite() {
     }
@@ -44,7 +44,7 @@ public class Sprite extends Rect {
         );
     }
 
-    public void setHightProportion(float height) {
+    public void setHeightProportion(float height) {
         setHeight(height);
         float aspect = regions[frame].getRegionWidth() / (float) regions[frame].getRegionHeight();
         setWidth(aspect * height);
@@ -81,14 +81,14 @@ public class Sprite extends Rect {
     }
 
     public void destroy() {
-        this.isDestroid = true;
+        this.isDestroyed = true;
     }
 
     public void flushDestroy() {
-        this.isDestroid = false;
+        this.isDestroyed = false;
     }
 
-    public boolean isDestroid() {
-        return isDestroid;
+    public boolean isDestroyed() {
+        return isDestroyed;
     }
 }

@@ -15,9 +15,8 @@ import org.ldvgr.game.base.BaseScreen;
 import org.ldvgr.game.math.Rect;
 import org.ldvgr.game.sprite.Background;
 import org.ldvgr.game.sprite.Star;
-import org.ldvgr.game.sprite.game.Explosion;
+import org.ldvgr.game.sprite.game.Enemy.EnemyEmitter;
 import org.ldvgr.game.sprite.game.MainShip;
-import org.ldvgr.game.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
     TextureAtlas atlas;
@@ -27,7 +26,7 @@ public class GameScreen extends BaseScreen {
     private Star stars[];
     private MainShip mainShip;
     private BulletPool bulletPool;
-    private ExplosionPool explosions;
+    private ExplosionPool explosionPool;
     private EnemyPool enemyPool;
     private EnemyEmitter enemyEmitter;
     Music music;
@@ -44,10 +43,10 @@ public class GameScreen extends BaseScreen {
         for (int i = 0; i < stars.length; i++) {
             stars[i] = new Star(atlas);
         }
+        explosionPool = new ExplosionPool(sampleATLAS);
         bulletPool = new BulletPool();
-        mainShip = new MainShip(atlas, bulletPool);
-        explosions = new ExplosionPool(sampleATLAS);
-        enemyPool = new EnemyPool(bulletPool);
+        mainShip = new MainShip(atlas, bulletPool, explosionPool);
+        enemyPool = new EnemyPool(bulletPool, worldBounds, explosionPool);
         enemyEmitter = new EnemyEmitter(enemyPool, sampleATLAS, worldBounds);
 
         music = Gdx.audio.newMusic(Gdx.files.internal("magic_space.mp3"));
@@ -58,19 +57,19 @@ public class GameScreen extends BaseScreen {
     }
 
     public void update(float delta) {
+        explosionPool.updateActiveSprites(delta);
         mainShip.update(delta);
         for (Star star : stars) {
             star.update(delta);
         }
         bulletPool.updateActiveSprites(delta);
-        explosions.updateActiveSprites(delta);
         enemyPool.updateActiveSprites(delta);
         enemyEmitter.generate(delta);
     }
 
-    public void deleteAllDestroid() {
+    public void deleteAllDestroyed() {
         bulletPool.freeAllDestroyedActiveSprites();
-        explosions.freeAllDestroyedActiveSprites();
+        explosionPool.freeAllDestroyedActiveSprites();
         enemyPool.freeAllDestroyedActiveSprites();
     }
 
@@ -84,9 +83,9 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
+        explosionPool.drawActiveSprites(batch);
         mainShip.draw(batch);
         bulletPool.drawActiveSprites(batch);
-        explosions.drawActiveSprites(batch);
         enemyPool.drawActiveSprites(batch);
         batch.end();
     }
@@ -95,7 +94,7 @@ public class GameScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         update(delta);
-        deleteAllDestroid();
+        deleteAllDestroyed();
         draw();
     }
 
@@ -104,7 +103,7 @@ public class GameScreen extends BaseScreen {
         backgr.dispose();
         atlas.dispose();
         bulletPool.dispose();
-        explosions.dispose();
+        explosionPool.dispose();
         enemyPool.dispose();
         music.dispose();
         super.dispose();
@@ -134,10 +133,7 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public void touchDown(Vector2 touch, int pointer) {
-        Explosion explosion = explosions.obtain();
-        explosion.set(0.15f, touch);
         mainShip.touchDown(touch, pointer);
-
     }
 
     @Override

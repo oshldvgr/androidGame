@@ -20,7 +20,7 @@ public class Explosion extends Sprite {
 
     public void set(float height, Vector2 pos) {
         this.pos.set(pos);
-        setHightProportion(height);
+        setHeightProportion(height);
         explosionSound.play(0.8f);
     }
 
@@ -28,7 +28,7 @@ public class Explosion extends Sprite {
     public void update(float delta) {
         animateTimer += delta;
         if (animateTimer >= animateInterval) {
-            animateTimer = 0.f;
+            animateTimer = 0f;
             if (++frame == regions.length) {
                 destroy();
             }

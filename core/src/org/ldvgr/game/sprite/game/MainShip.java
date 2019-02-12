@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import org.ldvgr.game.Pool.BulletPool;
+import org.ldvgr.game.Pool.ExplosionPool;
 import org.ldvgr.game.math.Rect;
 
 public class MainShip extends Ship {
 
     private static final int INVALID_POINTER = -1;
-
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
@@ -20,18 +20,19 @@ public class MainShip extends Ship {
     private boolean isPressedRight;
 
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
-        super(atlas.findRegion("main_ship"), 3, 1, 3);
-        this.bulletPool = bulletPool;
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
+        super(atlas.findRegion("main_ship"), 3, 1, 3,
+                Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3")),
+                bulletPool, explosionPool);
+
         this.bulletRegion = atlas.findRegion("star1");
-        setHightProportion(0.15f);
+        setHeightProportion(0.15f);
         frame = 1;
         this.reloadInterval = 0.2f;
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3"));
         this.bulletVelocity = new Vector2(0, 0.5f);
-        this.bulletHieght = 0.01f;
+        this.bulletHeight = 0.01f;
         this.damage = 1;
-        this.helth = 100;
+        this.health = 100;
 
     }
 
@@ -44,12 +45,10 @@ public class MainShip extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
-        reloadTimer += delta;
         pos.mulAdd(velocity, delta);
-        if (reloadTimer >= reloadInterval) {
-            reloadTimer = 0f;
-            shoot();
-        }
+
+        shootByTimer(delta);
+
         if (getLeft() < worldBounds.getLeft()) {
             setLeft(worldBounds.getLeft());
             stop();
@@ -72,10 +71,6 @@ public class MainShip extends Ship {
             case Input.Keys.RIGHT:
                 isPressedRight = true;
                 moveRight();
-                break;
-            case Input.Keys.UP:
-            case Input.Keys.ENTER:
-                shoot();
                 break;
         }
     }

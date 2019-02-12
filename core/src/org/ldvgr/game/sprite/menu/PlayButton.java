@@ -9,7 +9,7 @@ public class PlayButton extends ScaledTouchUpButton {
 
     public PlayButton(TextureAtlas atlas) {
         super(atlas.findRegion("play_normal"));
-        setHightProportion(0.1f);
+        setHeightProportion(0.1f);
         pos.set(0.0f, 0.1f);
     }
 

@@ -5,30 +5,39 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import org.ldvgr.game.Pool.BulletPool;
+import org.ldvgr.game.Pool.ExplosionPool;
 import org.ldvgr.game.base.Sprite;
 import org.ldvgr.game.math.Rect;
 
-public class Ship extends Sprite {
+public abstract class Ship extends Sprite {
+
+    private float reloadTimer;
+    private ExplosionPool explosionPool;
+    private BulletPool bulletPool;
+    private Sound shootSound;
 
     protected Rect worldBounds;
-    protected BulletPool bulletPool;
     protected TextureRegion bulletRegion;
     protected Vector2 velocity = new Vector2();
     protected float reloadInterval;
-    protected float reloadTimer;
-    protected Sound shootSound;
 
     protected Vector2 bulletVelocity;
-    protected float bulletHieght;
+    protected float bulletHeight;
     protected int damage;
-    protected int helth;
+    protected int health;
 
-    public Ship(TextureRegion region, int rows, int cols, int frames) {
+    public Ship(TextureRegion region, int rows, int cols, int frames, Sound shootSound, BulletPool bulletPool, ExplosionPool explosionPool) {
         super(region, rows, cols, frames);
+        this.explosionPool = explosionPool;
+        this.shootSound = shootSound;
+        this.bulletPool = bulletPool;
     }
 
-    public Ship() {
-        super();
+    public Ship(Rect worldBounds, Sound shootSound, BulletPool bulletPool, ExplosionPool explosionPool) {
+        this.explosionPool = explosionPool;
+        this.worldBounds = worldBounds;
+        this.bulletPool = bulletPool;
+        this.shootSound = shootSound;
     }
 
     @Override
@@ -37,19 +46,28 @@ public class Ship extends Sprite {
         super.resize(worldBounds);
     }
 
-    public void shoot() {
+    private void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this,
                 bulletRegion,
                 pos,
                 bulletVelocity,
-                bulletHieght,
-                worldBounds, damage);
+                bulletHeight,
+                worldBounds,
+                damage);
         shootSound.play(0.01f);
     }
 
+    protected void boom() {
+        Explosion explosion = explosionPool.obtain();
+        explosion.set(getHeight(), pos);
+    }
 
-    public void dispose() {
-        shootSound.dispose();
+    protected void shootByTimer(float delta) {
+        reloadTimer += delta;
+        if (reloadTimer >= reloadInterval) {
+            reloadTimer = 0f;
+            shoot();
+        }
     }
 }
