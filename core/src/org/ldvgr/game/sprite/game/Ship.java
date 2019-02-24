@@ -11,10 +11,12 @@ import org.ldvgr.game.math.Rect;
 
 public abstract class Ship extends Sprite {
 
-    private float reloadTimer;
+    private float reloadTimer = 0f;
     private ExplosionPool explosionPool;
     private BulletPool bulletPool;
     private Sound shootSound;
+    private float damageInterval = 0.1f;
+    private float damageTimer = damageInterval;
 
     protected Rect worldBounds;
     protected TextureRegion bulletRegion;
@@ -26,18 +28,20 @@ public abstract class Ship extends Sprite {
     protected int damage;
     protected int health;
 
-    public Ship(TextureRegion region, int rows, int cols, int frames, Sound shootSound, BulletPool bulletPool, ExplosionPool explosionPool) {
+    public Ship(TextureRegion region, int rows, int cols, int frames, Rect worldBounds,
+                Sound shootSound, BulletPool bulletPool, ExplosionPool explosionPool) {
         super(region, rows, cols, frames);
+        this.worldBounds = worldBounds;
         this.explosionPool = explosionPool;
         this.shootSound = shootSound;
         this.bulletPool = bulletPool;
     }
 
     public Ship(Rect worldBounds, Sound shootSound, BulletPool bulletPool, ExplosionPool explosionPool) {
-        this.explosionPool = explosionPool;
         this.worldBounds = worldBounds;
-        this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.shootSound = shootSound;
+        this.bulletPool = bulletPool;
     }
 
     @Override
@@ -55,7 +59,7 @@ public abstract class Ship extends Sprite {
                 bulletHeight,
                 worldBounds,
                 damage);
-        shootSound.play(0.01f);
+        // shootSound.play(0.005f);
     }
 
     protected void boom() {
@@ -69,5 +73,39 @@ public abstract class Ship extends Sprite {
             reloadTimer = 0f;
             shoot();
         }
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        damageTimer += delta;
+        if (damageTimer >= damageInterval) {
+            frame = 0;
+        }
+
+    }
+
+    public abstract boolean isDamageCollisions(Sprite sprite);
+
+    public void damage(int damage) {
+        frame = 1;
+        damageTimer = 0;
+
+        health = health - damage;
+
+        System.out.println("Осталось жизней у " + this + ": " + health);
+        if (health <= 0) {
+            destroy();
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        boom();
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

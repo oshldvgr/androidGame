@@ -20,8 +20,6 @@ public class BaseScreen implements Screen, InputProcessor {
     private Matrix4 worldToGl; // матрица перехода из игровых координат в OpenGL отрисовку
     private Matrix3 screenToWorlds; //из пикселей в координаты мира
     private Vector2 touch;
-    //private Texture background;
-
     @Override
     public void show() {
         System.out.println("show");
@@ -33,7 +31,6 @@ public class BaseScreen implements Screen, InputProcessor {
         this.worldToGl = new Matrix4();
         touch = new Vector2();
         screenToWorlds = new Matrix3();
-        //background = new Texture("background.png");
     }
 
     @Override
@@ -41,7 +38,6 @@ public class BaseScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        // batch.draw(background, -0.5f, -0.5f, 1f, 1f);
         batch.end();
     }
 
@@ -62,8 +58,6 @@ public class BaseScreen implements Screen, InputProcessor {
 
     public void resize(Rect worldBounds) {
     }
-
-
 
     @Override
     public void pause() {

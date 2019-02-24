@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import org.ldvgr.game.Pool.BulletPool;
 import org.ldvgr.game.Pool.ExplosionPool;
+import org.ldvgr.game.base.Sprite;
 import org.ldvgr.game.math.Rect;
 
 public class MainShip extends Ship {
@@ -20,8 +21,8 @@ public class MainShip extends Ship {
     private boolean isPressedRight;
 
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
-        super(atlas.findRegion("main_ship"), 3, 1, 3,
+    public MainShip(TextureAtlas atlas, Rect worldBounds, BulletPool bulletPool, ExplosionPool explosionPool) {
+        super(atlas.findRegion("main_ship"), 3, 1, 3, worldBounds,
                 Gdx.audio.newSound(Gdx.files.internal("SHOOT017.mp3")),
                 bulletPool, explosionPool);
 
@@ -32,8 +33,7 @@ public class MainShip extends Ship {
         this.bulletVelocity = new Vector2(0, 0.5f);
         this.bulletHeight = 0.01f;
         this.damage = 1;
-        this.health = 100;
-
+        this.health = 2;
     }
 
     @Override
@@ -145,5 +145,10 @@ public class MainShip extends Ship {
         velocity.setZero();
     }
 
+    @Override
+    public boolean isDamageCollisions(Sprite sprite) {
+        return ((sprite.getLeft() >= getLeft()) & (sprite.getRight() <= getRight())
+                & (sprite.getPos().y <= pos.y));
+    }
 
 }

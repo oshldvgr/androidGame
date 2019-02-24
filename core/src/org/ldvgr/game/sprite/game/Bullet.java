@@ -10,7 +10,7 @@ public class Bullet extends Sprite {
     private Rect worldBounds;
     private Vector2 velocity = new Vector2();
     private int damage;
-    private Object owner;
+    private Ship owner;
 
     public Bullet() {
         regions = new TextureRegion[1];
@@ -25,7 +25,7 @@ public class Bullet extends Sprite {
     }
 
     public void set(
-            Object owner,
+            Ship owner,
             TextureRegion region,
             Vector2 pos0,
             Vector2 v0,
@@ -45,7 +45,7 @@ public class Bullet extends Sprite {
         return damage;
     }
 
-    public Object getOwner() {
+    public Ship getOwner() {
         return owner;
     }
 }

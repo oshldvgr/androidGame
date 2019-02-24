@@ -15,8 +15,12 @@ import org.ldvgr.game.base.BaseScreen;
 import org.ldvgr.game.math.Rect;
 import org.ldvgr.game.sprite.Background;
 import org.ldvgr.game.sprite.Star;
+import org.ldvgr.game.sprite.game.Bullet;
 import org.ldvgr.game.sprite.game.Enemy.EnemyEmitter;
+import org.ldvgr.game.sprite.game.Enemy.EnemyShip;
 import org.ldvgr.game.sprite.game.MainShip;
+
+import java.util.List;
 
 public class GameScreen extends BaseScreen {
     TextureAtlas atlas;
@@ -45,8 +49,8 @@ public class GameScreen extends BaseScreen {
         }
         explosionPool = new ExplosionPool(sampleATLAS);
         bulletPool = new BulletPool();
-        mainShip = new MainShip(atlas, bulletPool, explosionPool);
-        enemyPool = new EnemyPool(bulletPool, worldBounds, explosionPool);
+        mainShip = new MainShip(atlas, worldBounds, bulletPool, explosionPool);
+        enemyPool = new EnemyPool(bulletPool, worldBounds, explosionPool, mainShip);
         enemyEmitter = new EnemyEmitter(enemyPool, sampleATLAS, worldBounds);
 
         music = Gdx.audio.newMusic(Gdx.files.internal("magic_space.mp3"));
@@ -58,7 +62,9 @@ public class GameScreen extends BaseScreen {
 
     public void update(float delta) {
         explosionPool.updateActiveSprites(delta);
-        mainShip.update(delta);
+        if (!mainShip.isDestroyed()) {
+            mainShip.update(delta);
+        }
         for (Star star : stars) {
             star.update(delta);
         }
@@ -84,7 +90,9 @@ public class GameScreen extends BaseScreen {
             star.draw(batch);
         }
         explosionPool.drawActiveSprites(batch);
-        mainShip.draw(batch);
+        if (!mainShip.isDestroyed()) {
+            mainShip.draw(batch);
+        }
         bulletPool.drawActiveSprites(batch);
         enemyPool.drawActiveSprites(batch);
         batch.end();
@@ -94,9 +102,47 @@ public class GameScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        checkCollisions();
         deleteAllDestroyed();
         draw();
     }
+
+    private void checkCollisions() {
+        List<EnemyShip> enemyList = enemyPool.getActiveObjects();
+        for (EnemyShip enemy : enemyList) {
+            if (!enemy.isDestroyed()) {
+                float minDist = enemy.getHalfWidth() + mainShip.getHalfWidth();
+                if (enemy.pos.dst2(mainShip.pos) <= minDist * minDist) {
+                    enemy.destroy();
+                    mainShip.damage(enemy.getDamage());
+                    return;
+                }
+            }
+        }
+
+        List<Bullet> bulletList = bulletPool.getActiveObjects();
+        for (EnemyShip enemy : enemyList) {
+            if (!enemy.isDestroyed()) {
+                for (Bullet bullet : bulletList) {
+                    if (bullet.getOwner() == mainShip && !bullet.isDestroyed() &&
+                            enemy.isDamageCollisions(bullet)) {
+                        bullet.destroy();
+                        enemy.damage(bullet.getDamage());
+                    }
+                }
+            }
+        }
+
+        for (Bullet bullet : bulletList) {
+            if (bullet.getOwner() != mainShip && !bullet.isDestroyed() &&
+                    mainShip.isDamageCollisions(bullet)) {
+                bullet.destroy();
+                mainShip.damage(bullet.getDamage());
+
+            }
+        }
+    }
+    //!bullet.isOutside(enemy)
 
     @Override
     public void dispose() {
@@ -120,24 +166,24 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
-        mainShip.keyDown(keycode);
+        if (!mainShip.isDestroyed()) mainShip.keyDown(keycode);
         return super.keyDown(keycode);
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        mainShip.keyUp(keycode);
+        if (!mainShip.isDestroyed()) mainShip.keyUp(keycode);
         return super.keyUp(keycode);
     }
 
 
     @Override
     public void touchDown(Vector2 touch, int pointer) {
-        mainShip.touchDown(touch, pointer);
+        if (!mainShip.isDestroyed()) mainShip.touchDown(touch, pointer);
     }
 
     @Override
     public void touchUp(Vector2 touch, int pointer) {
-        mainShip.touchUp(touch, pointer);
+        if (!mainShip.isDestroyed()) mainShip.touchUp(touch, pointer);
     }
 }
