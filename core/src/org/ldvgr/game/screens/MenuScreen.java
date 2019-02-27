@@ -1,4 +1,4 @@
-package org.ldvgr.game.base.screens;
+package org.ldvgr.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
